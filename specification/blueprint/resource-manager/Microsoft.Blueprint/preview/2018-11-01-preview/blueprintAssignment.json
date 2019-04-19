@@ -141,6 +141,53 @@
         }
       }
     },
+    "/{scope}/providers/Microsoft.Blueprint/blueprintAssignments/{assignmentName}/WhatIf": {
+      "post": {
+        "operationId": "Assignments_WhatIfAssignment",
+        "description": "Lists the resources that would be created or modified if the assignment were to be created.",
+        "x-ms-examples": {
+          "WhoIsBlueprint_Action": {
+            <!-- TODO (R) -->
+            "$ref": "./examples/BlueprintAssignment_Create.json"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/ScopeParameter"
+          },
+          {
+            "$ref": "#/parameters/AssignmentNameParameter"
+          },
+          {
+            "name": "assignment",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Assignment"
+            },
+            "description": "Blueprint assignment object to evaluate against the current state of the environment."
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Accepted - Returns URL in Location header to query for long-running operation status.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "URL to get status of this long-running operation."
+              },
+              "Retry-After": {
+                "type": "string",
+                "description": "Number of seconds to wait before polling for status."
+              }
+            }
+          }
+        }
+      }
+    },
     "/{scope}/providers/Microsoft.Blueprint/blueprintAssignments/{assignmentName}/WhoIsBlueprint": {
       "post": {
         "operationId": "Assignments_WhoIsBlueprint",
@@ -164,7 +211,7 @@
         "responses": {
           "200": {
             "description": "Blueprints service SPN objectId",
-            "schema":{
+            "schema": {
               "$ref": "#/definitions/WhoIsBlueprintContract"
             }
           }
@@ -251,7 +298,7 @@
       "description": "User-assigned managed identity.",
       "properties": {
         "principalId": {
-          "type":  "string",
+          "type": "string",
           "description": "Azure Active Directory principal ID associated with this Identity."
         },
         "clientId": {
@@ -563,7 +610,7 @@
         }
       }
     },
-    "WhoIsBlueprintContract":{
+    "WhoIsBlueprintContract": {
       "description": "Response schema for querying the Azure Blueprints service principal in the tenant.",
       "properties": {
         "objectId": {

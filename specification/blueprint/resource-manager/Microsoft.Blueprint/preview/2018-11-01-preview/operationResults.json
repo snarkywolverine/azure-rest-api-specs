@@ -1,0 +1,185 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "BlueprintClient",
+    "description": "Azure Blueprints Client provides access to blueprint definitions, assignments, and artifacts, and related blueprint operations.",
+    "version": "2018-11-01-preview"
+  },
+  "host": "management.azure.com",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "azure_auth": [
+        "user_impersonation"
+      ]
+    }
+  ],
+  "securityDefinitions": {
+    "azure_auth": {
+      "type": "oauth2",
+      "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/authorize",
+      "flow": "implicit",
+      "description": "Azure Active Directory OAuth2 Flow",
+      "scopes": {
+        "user_impersonation": "impersonate your user account"
+      }
+    }
+  },
+  "paths": {
+    "/{scope}/providers/Microsoft.Blueprint/operationresults/{operationName}": {
+      "get": {
+        "summary": "Retrieves the latest results of asynchronous operations",
+        "operationId": "Blueprints_AsynchronousResults",
+        "parameters": [
+          {
+            "$ref": "#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/ScopeParameter"
+          },
+          {
+            "$ref": "#/parameters/OperationNameParameter"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Accepted - Returns URL in Location header to query for long-running operation status.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "URL to get status of this long-running operation."
+              },
+              "Retry-After": {
+                "type": "string",
+                "description": "Number of seconds to wait before polling for status."
+              }
+            }
+          },
+          "200": {
+            "description": "OK - Returns What-If Operation Status",
+            "schema": {
+              "$ref": "#/definitions/WhatIfOperationResult"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "definitions": {
+    "WhatIfChange": {
+      "description": "Information about a single resource change predicted by What-If operation.",
+      "properties": {
+        "resourceId": {
+          "readOnly": true,
+          "type": "string",
+          "description": "Resource ID"
+        },
+        "changeType": {
+          "readOnly": true,
+          "type": "string",
+          "description": "Type of change that will be made to the resource when the deployment is executed.",
+          <!-- TODO (R) -->
+          "enum": [
+            "NoChange",
+            "Create",
+            "Delete",
+            "NoDeployment",
+            "Modify"
+          ],
+          "x-ms-enum": {
+            "name": "ChangeType",
+            "modelAsString": false,
+            "values": [
+              {
+                "value": "NoChange",
+                "description": "The resource exists in both current and desired state and will not be modified when the deployment is executed."
+              },
+              {
+                "value": "Create",
+                "description": "The resource does not exist in the current state but is present in the desired state. The resource will be created when the deployment is executed."
+              },
+              {
+                "value": "Delete",
+                "description": "The resource exists in the current state and is missing from the desired state. The resource will be deleted when the deployment is executed."
+              },
+              {
+                "value": "NoDeployment",
+                "description": "The resource exists in the current state and is missing from the desired state. The resource will not be deployed or modified when the deployment is executed."
+              },
+              {
+                "value": "Modify",
+                "description": "The resource exists in both current and desired state and will be deployed. The properties of the resource may change as a result."
+              }
+            ]
+          }
+        }
+      }
+    },
+    "WhatIfOperationProperties": {
+      "description": "Deployment operation properties.",
+      "properties": {
+        "changes": {
+          "readOnly": true,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/WhatIfChange"
+          },
+          "description": "List of resource changes predicted by What-If operation."
+        }
+      }
+    },
+    "WhatIfOperationResult": {
+      "description": "Result of the What-If operation. Contains a list of predicted changes and a URL link to get to the next set of results.",
+      "properties": {
+        "status": {
+          "readOnly": true,
+          "type": "string",
+          "description": "Status of the What-If operation."
+        },
+        "properties": {
+          "$ref": "#/definitions/WhatIfOperationProperties",
+          "description": "What-If operation properties."
+        },
+        "error": {
+          "$ref": "#/definitions/ResourceManagementErrorWithDetails",
+          "description": "Error when What-If operation fails."
+        }
+      }
+    },
+    "parameters": {
+      "ScopeParameter": {
+        "name": "scope",
+        "in": "path",
+        "required": true,
+        "type": "string",
+        "description": "The scope of the resource. Valid scopes are: management group (format: '/providers/Microsoft.Management/managementGroups/{managementGroup}'), subscription (format: '/subscriptions/{subscriptionId}'). For blueprint assignments management group scope is reserved for future use.",
+        "x-ms-parameter-location": "method",
+        "x-ms-skip-url-encoding": true
+      },
+      "OperationNameParameter": {
+        "name": "operationName",
+        "in": "path",
+        "required": true,
+        "type": "string",
+        "x-ms-parameter-location": "method",
+        "description": "Name of the requested operation"
+      },
+      "ApiVersionParameter": {
+        "name": "api-version",
+        "in": "query",
+        "required": true,
+        "type": "string",
+        "x-ms-parameter-location": "client",
+        "description": "Client API Version."
+      }
+    }
+  }
